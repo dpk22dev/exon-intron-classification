@@ -1,0 +1,88 @@
+function [  ] = proj_process_intron( str, user )
+%PROJ_PROCESS_INTRON Summary of this function goes here
+%   Detailed explanation goes here
+
+%########## you can change WINSIZE but remember to change in all files ############
+WINSIZE = 8; %default winsize
+
+fid = fopen( 'proj_sizes.txt');
+size = str2double( fgets( fid ) );
+fclose( fid );
+
+if size > 0
+    WINSIZE = size;
+end
+%disp( WINSIZE );
+
+%initialise arrival arrays for bases a, c, g, t with zeroes initially
+fprintf('\nprocessing intron:\n');
+disp(  str );
+
+arrival_a = zeros( 1, WINSIZE );
+prev_a = 0;
+
+arrival_t = zeros( 1, WINSIZE );
+prev_t = 0;
+
+arrival_g = zeros( 1, WINSIZE );
+prev_g = 0;
+
+arrival_c = zeros( 1, WINSIZE );
+prev_c = 0;
+
+
+
+for i=1:length( str )
+    switch str(i)  
+        
+        case 'a'
+        temp = i - prev_a;
+        if temp > 0 && temp <= WINSIZE
+            arrival_a( temp ) = arrival_a( temp ) + 1;                 
+        end
+        prev_a = i;
+        
+    case 'c'
+        temp = i - prev_c;
+        if temp > 0 && temp <= WINSIZE
+            arrival_c( temp ) = arrival_c( temp ) + 1;                 
+        end
+        prev_c = i;
+        
+    case 'g'
+        temp = i - prev_g;
+        if temp > 0 && temp <= WINSIZE
+            arrival_g( temp ) = arrival_g( temp ) + 1;                 
+        end
+        prev_g = i;
+        
+    case 't'
+        temp = i - prev_t;
+        if temp > 0 && temp <= WINSIZE
+            arrival_t( temp ) = arrival_t( temp ) + 1;                 
+        end
+        prev_t = i;
+        
+        
+%    otherwise
+%        disp('process_intron: not matched --ignore me');    
+    
+    end
+    
+end
+
+% save arrival_a,c,g,t to file for future use 
+if( user == 0 )
+    dlmwrite( 'intron_a.txt',arrival_a,'delimiter',' ','-append' );
+    dlmwrite( 'intron_c.txt',arrival_c,'delimiter',' ','-append' );
+    dlmwrite( 'intron_g.txt',arrival_g,'delimiter',' ','-append' );
+    dlmwrite( 'intron_t.txt',arrival_t,'delimiter',' ','-append' );
+else
+    dlmwrite( 'uintron_a.txt',arrival_a,'delimiter',' ','-append' );
+    dlmwrite( 'uintron_c.txt',arrival_c,'delimiter',' ','-append' );
+    dlmwrite( 'uintron_g.txt',arrival_g,'delimiter',' ','-append' );
+    dlmwrite( 'uintron_t.txt',arrival_t,'delimiter',' ','-append' );
+end
+
+end
+
